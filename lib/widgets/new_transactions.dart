@@ -13,20 +13,22 @@ class _NewTransactionState extends State<NewTransaction> {
   final titleController = TextEditingController();
   final amountController = TextEditingController();
 
-  late DateTime selectedDate;
+  DateTime selectedDate = DateTime.now();
+
+  bool isSelected = false;
 
   void presentDatePicker() {
+    print("this works");
     showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2022),
+      firstDate: DateTime(2022, 1),
       lastDate: DateTime.now(),
-    ).then((pickedDate) {
-      if (pickedDate == null) {
-        return;
-      } else {
+    ).then((picked) {
+      if (picked != null) {
         setState(() {
-          selectedDate = pickedDate;
+          isSelected = true;
+          selectedDate = picked;
           print(selectedDate);
         });
       }
@@ -57,14 +59,14 @@ class _NewTransactionState extends State<NewTransaction> {
                 children: [
                   Expanded(
                     child: Text(
-                      selectedDate == null
+                      !isSelected
                           ? 'No Date Chosen'
                           : DateFormat.yMd().format(selectedDate),
                     ),
                   ),
                   TextButton(
                     onPressed: () {
-                      presentDatePicker;
+                      presentDatePicker();
                     },
                     child: Text(
                       'Choose Date',
@@ -78,8 +80,8 @@ class _NewTransactionState extends State<NewTransaction> {
             ElevatedButton(
               onPressed: () {
                 if (selectedDate != null)
-                  widget.addTx(
-                      titleController.text, int.parse(amountController.text));
+                  widget.addTx(titleController.text,
+                      int.parse(amountController.text), selectedDate);
                 Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(
